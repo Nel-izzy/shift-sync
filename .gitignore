@@ -6,3 +6,7 @@ dist/
 coverage/
 *.log
 pgdata/
+*.tsbuildinfo
+drizzle.config.js
+drizzle.config.js.map
+drizzle.config.d.ts
