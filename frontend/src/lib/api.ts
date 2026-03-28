@@ -28,16 +28,9 @@ api.interceptors.response.use(
     if (
       err.response?.status === 401 &&
       typeof window !== 'undefined' &&
-      // Never redirect if the failing request was the login call itself
       !err.config?.url?.includes('/auth/login') &&
-      // Never redirect if we're already on the login page
       !window.location.pathname.includes('/auth/login') &&
-      // Only redirect if there is actually a stale/invalid token stored.
       !!localStorage.getItem('token') &&
-      // ✅ CRITICAL FIX: Never redirect while AuthProvider is still verifying
-      // the token via authApi.me(). Other queries (notifications, shifts, etc.)
-      // fire as soon as the layout mounts, which can be before me() resolves.
-      // Without this guard those 401s would trigger a redirect mid-initialization.
       authInitialized
     ) {
       localStorage.removeItem('token');
@@ -99,7 +92,16 @@ export const swapsApi = {
 
 // ---- Users ----
 export const usersApi = {
+  // Admin / Manager
   list: () => api.get('/users').then(r => r.data),
+  get: (id: string) => api.get(`/users/${id}`).then(r => r.data),
+  getUserAvailability: (id: string) => api.get(`/users/${id}/availability`).then(r => r.data),
+  getUserLocations: (id: string) => api.get(`/users/${id}/locations`).then(r => r.data),
+  certify: (userId: string, locationId: string) =>
+    api.post(`/users/${userId}/certify/${locationId}`).then(r => r.data),
+  decertify: (userId: string, locationId: string) =>
+    api.post(`/users/${userId}/decertify/${locationId}`).then(r => r.data),
+  // Current user (any role)
   getAvailability: () => api.get('/users/me/availability').then(r => r.data),
   setAvailability: (windows: any[]) =>
     api.post('/users/me/availability', { windows }).then(r => r.data),
@@ -107,6 +109,7 @@ export const usersApi = {
     api.post('/users/me/availability/exceptions', data).then(r => r.data),
   deleteException: (id: string) =>
     api.delete(`/users/me/availability/exceptions/${id}`).then(r => r.data),
+  getMyAssignments: () => api.get('/users/me/assignments').then(r => r.data),
   updateProfile: (data: any) => api.patch('/users/me', data).then(r => r.data),
 };
 
