@@ -72,9 +72,9 @@ On first boot the server will:
 
 You should see in the terminal:
 ```
-✅ Database schema ready
-🌱 Running seed...
-✅ Seed complete
+Database schema ready
+Running seed...
+Seed complete
 ShiftSync API running on port 4000
 ```
 
